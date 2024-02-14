@@ -1,0 +1,460 @@
+---
+title: "Food Insecurity During the COVID-19 Pandemic"
+format: pdf
+figure:
+  align: center
+---
+
+## BST260 Final Project
+
+Sara O'Brien
+
+December 9, 2023
+
+Harvard T.H. Chan School of Public Health
+
+### [Introduction]{.underline}
+
+The COVID-19 pandemic had a drastic impact on agricultural production and global supply chains, resulting in widespread food shortages and inflated food prices. Supply issues coupled with high unemployment rates, school closures, and a lack of access to grocery stores during quarantine led to a food insecurity crisis in the United States.^1^ Food insecurity is defined by the U.S. Department of Agriculture (USDA) as a household-level economic and social condition of limited or uncertain access to adequate food.^2^ This socioeconomic condition is associated with an increased risk of diabetes, obesity, heart disease, mental health disorders, and other chronic diseases, making it a high-priority issue in public health research and policy.^3^
+
+The Supplemental Nutrition Assistance Program (SNAP) is a federal program that aims to reduce poverty and food insecurity while stimulating economic growth. Following the declaration of a public health emergency during the COVID-19 pandemic, the USDA granted flexibility to states to ease SNAP program administration.^4^ The aim of this project was to assess the association between COVID-19 cases and food insecurity on a county-level in the U.S. A secondary aim was to consider how SNAP participation, poverty, and income influence the relationship between COVID-19 cases and food insecurity. These aims were motivated by initial exploratory analyses that revealed a positive linear trend between COIVD-19 case rates and food insecurity rates (Figure 1). Leveraging county-level data from the Centers for Disease Control and Prevention (CDC),^5^ USDA,^6^ Feeding America,^7^ and U.S. Census Bureau,^8^ this project visualized the associations of interest in a series of time trends, summary plots, and regression models.
+
+### [Methods]{.underline}
+
+The project was carried out in three main steps: (1) data wrangling to create an analysis data set, (2) exploratory data analyses, and (3) regression analyses.
+
+##### 1. Data Wrangling
+
+The primary data wrangling required for this project was the cleaning and merging of county-level data from four different sources to pull in COVID-19 cases, food insecurity, SNAP participation, poverty and income, and population estimates.
+
+*COVID-19 Cases*
+
+The CDC continues to maintain a COVID-19 case surveillance database even after the end of the U.S. public health emergency declaration on May 11, 2023. The case reports are patient-level, de-identified, and reported by U.S. states and autonomous reporting entities, including New York City and the District of Columbia.^9^ All cases reported in 2021 were reported using the standardized case definitions for COVID-19 or lab-confirmed/probable cases, but the data is considered dynamic and provisional as health departments and entities receive new information. However, for the year being used in this project, 2021, the CDC has already reconciled and finalized case reporting.
+
+*SNAP Participation*
+
+During the pandemic, there was a government response called Pandemic Electronic Benefits Transfer (P-EBT) that provided benefits similar to SNAP benefits, allowing recipients to purchase foods eligible for SNAP.^10^ However, this was a temporary measure that could be received in addition to and separate from SNAP, with the majority of households eligible for both or neither. This project focuses on participation in SNAP during the pandemic rather than P-EBT since this measure could be captured longitudinally and was more reflective of individuals needing long-term assistance due to food insecurity and unemployment during the pandemic.
+
+SNAP serves two groups of low-income households: Public Assistance (PA) and Non-Public Assistance (NPA). PA households include only members who receive or are eligible to receive income from Temporary Assistance for Needy Families, General Relief, or Supplemental Security Income. NPA households are those with at least one member not eligible for one of the PA programs.^11^ The Bi-Annual State Project Area/County Level Participation and Issuance Data from the USDA Food and Nutrition Service contains counts of PA and NPA participation on the person and household level. Since COVID-19 case data is on the individual level, this project leveraged the summed SNAP total PA and NPA persons participation (as opposed to households) as a measure of SNAP participation. Since the other data sources were reported at the end of 2021 and SNAP data was only available at the county level bi-annually in January or July, SNAP data was pulled from January 2022 to reflect benefits dispersed in a similar time frame as the 2021 COVID-19 cases and counts of food insecurity.
+
+Of note, not all states report SNAP participation at the county level. The following states were removed for only reporting state-level SNAP data: AK, CT, ID, MA, ME, MO, MT, NE, NH, NY, OR, RI, UT, VT, WA, and WY. The SNAP data set contained some government assistance programs other than SNAP, which were excluded.
+
+*Other Data Sources*
+
+-   Food Insecurity: The most recently available data (2021) from the Feeding America's Map the Meal Gap initiative captures food insecurity estimates at the county level with an overall food insecurity rate (percentage of inhabitants who are food insecure) and a count of food insecure persons (number of inhabitants who are food insecure).
+
+-   Poverty and Income: The U.S. Census Bureau's Small Area Income and Poverty Estimates program produces county-level estimates of income and poverty.^12^ 2021 estimates were pulled into the analysis data set.
+
+-   Population Counts: The U.S. Census Bureau's County Population Totals similarly estimate county-level population counts and changes each year.^13^ 2021 estimates were pulled into the analysis data set.
+
+All data sources were merged using FIPS codes. The FIPS codes uniquely identify each county and are part of the Federal Information Processing Standards (FIPS) developed by the National Institute of Standards and Technology (NIST), U.S. Department of Commerce.
+
+##### 2. Exploratory data analysis
+
+Exploratory data analysis aimed to uncover patterns and trends in SNAP participation rates, COVID-19 case rates, food insecurity rates, and poverty rates. Although count data was also explored given the intent to employ Poisson regression models, rates were the key metric utilized in EDA so as to not skew trends with inflated population sizes. All rates were derived using count data for the respective measure by dividing over the county population. Scatter plots displayed the majority of comparisons between variables at a single time point, 2021, whereas box-and-whisker plots were selected to capture longitudinal trends in county-level food insecurity rates.
+
+##### 3. Regression analysis
+
+Since the outcome variable, food insecurity, was available as both a rate and a count measure, there was flexibility in the modeling approach for this project. Both multivariate linear models and Poisson regression models were run and compared to determine the model with the best fit and simplest interpretation to address the primary question of interest for this project. In the linear model, food insecurity was included as a continuous rate. Prior to running a linear model, the LINE assumptions were assessed to determine whether the regression estimates were likely to be biased. In the Poisson model, food insecurity was included as count data. Prior to conducting a Poisson model regressing food insecurity counts on COVID-19 case counts, the mean-variance assumption was assessed to determine whether the model exhibited over-dispersion. A Negative Binomial model allowing for over-dispersion was also explored to model the outcome data. Both the linear and Poisson models considered as covariates county-level COVID-19 case rates, SNAP participation rates, poverty rates, and median household income. Stepwise model selection, likelihood ratio tests, model AICs, and overall model parsimony were used to select the final model.
+
+### Results
+
+In 2021, there were 34,456,043 reported COVID-19 cases across all U.S. counties. Some cases were reported without a state or county and were excluded, leaving a total of 32,617,301 cases for analyses. Grouping across state and county, cumulative counts of the number of COVID-19 cases from January to December, 2021 were obtained, with a total of 1,787 counties in the initial analysis data set. There was a 1:1 match between the COVID-19 cases and food insecurity and poverty/income county-level data, but not between the COVID-19 and SNAP participation data, resulting in a final analytic data set of 1,467 observations/counties.
+
+From 2019 to 2021, there was a general trend of food insecurity rates decreasing on the county level across all U.S. geographic regions. Figure 2 provides evidence contrary to existing literature^1^ that there was not an overall increase in food insecurity during the time-frame of the COVID-19 pandemic according to Map the Meal Gap data. However, this box-and-whisker plot alone cannot capture the complexity of food insecurity and further exploration of trends between COVID-19 cases and food insecurity motivated the exploration of regression modeling techniques. Namely, plots of county-level COVID-19 case counts versus food insecurity counts and SNAP participants counts predictably followed a linear relationship, as seen in Figures 3 and 4. This trend was expected, given that counties with larger populations would experience more COVID-19 cases and higher SNAP participation compared to smaller counties. In Figures 1 and 5, the trend was still roughly linear and increasing when plotting COVID-19 case rates against food insecurity rates and SNAP participation rates. These exploratory plots suggested that even when controlling for population size, there was a relationship worth exploring between the predictors and outcome.
+
+*Linear Model*
+
+Model diagnostics for the multiple linear regression model were run to detect influential points and assess normality, homoscedasticity, and linearity. One key consideration for this data was that it was on the county level rather than the individual level, meaning that food insecurity rates are less clearly independent. However, proceeding with caution, the other LINE assumptions appeared to be satisfied based on the residual plots (Figures 6.1-6.4). The qq-plot was normal, there was equal variance of the residuals, and there was no indication of non-linear trends in the data. Furthermore, while there were a few influential observations based on Cook's distance, none were of major concern. Proceeding with a linear model in light of these considerations produced the final linear model summarized in Table 1.
+
+After controlling for both poverty rates and median income, SNAP participation rates were not a significant predictor of food insecurity in this model. For a 1-unit increase in COVID-19 cases/population, a county's food insecurity rate increased by an estimated 0.037 individuals/population, on average, holding all other covariates fixed. That is, the linear model suggested that there was a statistically significant harmful effect of COVID-19 on food insecurity at the county level. Moreover, the linear regression models revealed that poverty rates and median household income were highly significant predictors of food insecurity. For a 1-unit increase in the number of individuals in poverty/population and 1-dollar increase in median household income, a county's food insecurity rate increased by an estimated 0.388 individuals/population and decreased by an estimated 5.757e-07 individuals/population, respectively.
+
+*Poisson Model*
+
+Based on a dispersion test, the original Poisson model did not satisfy the mean-variance assumption. An extension of the Poisson model, the Negative Binomial model, was selected to help with overdispersion and lead to more valid inference by relaxing the mean-variance assumption. Since there was not an issue of excess zeroes, this model extension was selected over a Zero-inflated Poisson model. The Negative Binomial model had a lower AIC and a likelihood ratio test comparing the Poisson model to the Negative Binomial model returned a significant p-value \<2e-16, suggesting that the Negative Binomial model was preferred. However, stepwise model selection indicated that a final model without COVID-19 case rates was the best fit, and the Negative Binomial model including case rates did not indicate that this was a significant predictor of food insecurity counts. A summary of the Negative Binomial model is available in Table 2. Ultimately, this model type was less suited to the available analysis data than the linear model.
+
+### Conclusion
+
+This project investigated the relationship between COVID-19 cases and food insecurity at the U.S. county level. A multiple linear regression model provided evidence of a significant harmful effect of COVID-19 on food insecurity. While SNAP participation rates were not a significant predictor of food insecurity in the final adjusted model, poverty rates and median household income emerged as strong predictors of food insecurity. One main limitation of this project was that the data was pulled from a wide range of sources that collected data at different time points via differing methods. Additionally, these findings are at the county level, and future research could more systematically observe trends between COVID-19 and food insecurity on an individual level by sampling on individuals' food security status, income, geographic location, and other demographics. These findings highlight an interplay of risk factors for food insecurity and underscore the importance of socioeconomic policy interventions in addressing rising food insecurity concerns during public health emergencies.
+
+### References
+
+1.  https://www-ncbi-nlm-nih-gov.ezp-prod1.hul.harvard.edu/pmc/articles/PMC9335023/
+2.  https://www.ers.usda.gov/topics/food-nutrition-assistance/food-security-in-the-u-s/definitions-of-food-security/#:\~:text=Food%20insecurity%E2%80%94the%20condition%20assessed,may%20result%20from%20food%20insecurity.
+3.  https://www.nimhd.nih.gov/resources/understanding-health-disparities/food-accessibility-insecurity-and-health-outcomes.html
+4.  https://www.cbpp.org/research/food-assistance/most-states-are-using-new-flexibility-in-snap-to-respond-to-covid-19
+5.  https://data.cdc.gov/Case-Surveillance/COVID-19-Case-Surveillance-Public-Use-Data-with-Ge/n8mc-b4w4/data_preview
+6.  https://www.fns.usda.gov/pd/supplemental-nutrition-assistance-program-snap
+7.  https://map.feedingamerica.org/?\_ga=2.121274824.1141638753.1696475787-2079434502.1696475787
+8.  https://www.census.gov/programs-surveys/saipe.html
+9.  https://data.cdc.gov/Case-Surveillance/COVID-19-Case-Surveillance-Public-Use-Data-with-Ge/n8mc-b4w4/about_data
+10. https://www.fns.usda.gov/snap/pandemic-ebt-questions-and-answers-retailers#:\~:text=For%20some%20households%2C%20P%2DEBT,as%20SNAP%20benefits%20and%20households.
+11. https://www.dss.virginia.gov/geninfo/annual_report/benefits/index.html
+12. https://www.census.gov/data/datasets/2021/demo/saipe/2021-state-and-county.html
+13. https://www.census.gov/data/tables/time-series/demo/popest/2020s-counties-total.html
+
+### Appendix
+
+```{r, echo=FALSE, eval=TRUE, message=FALSE, warning=FALSE, error=FALSE}
+### Step (1) data wrangling to create an analysis data set
+
+# Load libraries/set up environment
+library(tidyverse)
+
+# COVID Case Data
+covid <- read.csv("data/covid.csv") %>% 
+  rename(cases = count,
+         state = res_state,
+         fips = county_fips_code) %>%
+  filter(!is.na(state) & !is.na(fips)) %>% 
+  mutate(fips = sprintf("%05d", fips))
+
+# Food Insecurity Data
+insecurity <- read.csv("data/insecurity.csv") %>% 
+  rename(fips = FIPS,
+         state = State,
+         insecurity_rate = `Overall.Food.Insecurity.Rate`,
+         insecurity_count = `X..of.Food.Insecure.Persons.Overall`) %>%  
+  filter(Year == 2021) %>% 
+  mutate(insecurity_rate = as.numeric(sub("%", "", insecurity_rate)),
+         insecurity_count = as.numeric(gsub(",", "", insecurity_count)),
+         fips = sprintf("%05d", fips)) %>% 
+  select(c(fips, insecurity_rate, insecurity_count))
+
+# SNAP Data
+snap <- read.csv("data/snap2022.csv", skip = 3) %>% 
+  rename(fips = `Substate.Region`,
+         snap_count = `Calc..SNAP.Total.PA.and.Non.PA.People`) %>% 
+  select(fips, snap_count) %>% 
+  mutate(fips = str_sub(fips, start = 1, end = 5),
+         snap_count = as.numeric(gsub(",", "", snap_count))) %>% 
+  group_by(fips) %>% 
+  summarize(snap_count = sum(snap_count)) %>% 
+  filter(!is.na(snap_count))
+
+# Poverty and income
+poverty <- read.csv("data/poverty.csv", skip = 2, colClasses = "character") %>% 
+  mutate(fips = paste0(`State.FIPS.Code`, `County.FIPS.Code`)) %>% 
+  rename(poverty = `Poverty.Estimate..All.Ages`,
+         median_income = `Median.Household.Income`) %>% 
+  select(fips, poverty, median_income) %>% 
+  mutate(poverty = ifelse(poverty == ".", NA, poverty),
+         poverty = as.numeric(gsub(",", "", poverty)),
+         median_income = ifelse(median_income == ".", NA, median_income),
+         median_income = as.numeric(gsub(",", "", median_income))) 
+
+# Population size
+population <- read.csv("data/population.csv", colClasses = "character") %>% 
+  rename(population = POPESTIMATE2021) %>% 
+  mutate(fips = paste0(STATE, COUNTY),
+         population = as.numeric(population)) %>% 
+  select(fips, population)
+
+# Final analysis dataset
+analysis <- left_join(covid, insecurity, by = "fips") %>% 
+  left_join(snap, by = "fips") %>% 
+  left_join(poverty, by = "fips") %>% 
+  left_join(population, by = "fips") %>% 
+  filter(!(state %in% c("AK", "CT", "ID", "MA", "ME", "MO", "MT", "NE", "NH", "NY", "OR", "RI", "UT", "VT", "WA", "WY"))) %>% 
+  mutate(region = case_when(
+    state %in% c("CT", "ME", "MA", "NH", "RI", "VT", "NJ", "NY", "PA") ~ "Northeast",
+    state %in% c("IL", "IN", "MI", "OH", "WI", "IA", "KS", "MN", "MO", "NE", "ND", "SD") ~ "Midwest",
+    state %in% c("DE", "FL", "GA", "MD", "NC", "SC", "VA", "WV", "AL", "KY", "MS", "TN", "AR", "LA", "OK", "TX", "DC") ~ "South",
+    state %in% c("AK", "CA", "HI", "OR", "WA", "AZ", "CO", "ID", "MT", "NV", "NM", "UT", "WY") ~ "West",
+    TRUE ~ NA)) %>% 
+  mutate(snap_rate = snap_count/population,
+         poverty_rate = poverty/population,
+         case_rate = cases/population,
+         insecurity_rate = insecurity_rate/100) %>% 
+  filter(!is.na(snap_count))
+```
+
+```{r, echo=FALSE}
+
+### Alternative approach to create analysis data sets using more complex data parsing and string replacements to match on character strings of county names instead of FIPS codes
+
+# # Load libraries
+# library(tidyverse)
+# 
+# #--- 1. COVID-19 Case Data
+# # Bring in COVID-19 case data
+# covid2021 <- read.csv("data/covid2021.csv") %>% 
+#   rename(cases = case_month,
+#          state = res_state,
+#          county = res_county) %>%
+#   filter(!is.na(state) & !is.na(county))
+# 
+# # Bring in food insecurity data 
+# insecurity <- read.csv("data/insecurity.csv") 
+# 
+# #--- Food Insecurity Data
+# # Check which county names in the insecurity df don't match COVID df
+# insecurity %>%
+#   filter(!grepl(" County", `County..State`, ignore.case = TRUE))
+# 
+# # Wrangle county names to match COVID data
+# insecurity <- insecurity %>%
+#   rename(state = State,
+#          county = `County..State`,
+#          insecurity_rate = `Overall.Food.Insecurity.Rate`,
+#          insecurity_count = `X..of.Food.Insecure.Persons.Overall`) %>% 
+#   filter(Year == 2021) %>% 
+#   mutate(county = toupper(sub(" County,.*| Borough,.*| Municipality,.*| City and Borough.*| City and| Census Area,.*| Parish,.*|,.*", "", county)),
+#          insecurity_rate = as.numeric(sub("%", "", insecurity_rate)),
+#          insecurity_count = as.numeric(gsub(",", "", insecurity_count))) %>% 
+#   select(c(state, county, insecurity_rate, insecurity_count))
+# 
+# # Merge COVID-19 and food insecurity data, removing states without SNAP county-level data
+# analysis <- left_join(covid2021, insecurity, by = c("state", "county")) %>% 
+#   filter(!(state %in% c("AK", "CT", "ID", "MA", "ME", "MO", "MT", "NE", "NH", "NY", "OR", "RI", "UT", "VT", "WA", "WY")))
+#  
+# #--- SNAP Data
+# # Bring in SNAP data and wrangle to match COVID data
+# snap <- read.csv("data/snap2022.csv", skip = 3) %>% 
+#   rename(county = `Substate.Region`,
+#          snap_count = `Calc..SNAP.Total.PA.and.Non.PA.People`) %>% 
+#   select(county, snap_count)
+# 
+# # Initial check of formatting for county names
+# snap <- snap %>%
+#   filter(grepl(" EBT", county, ignore.case = TRUE)) %>% 
+#   mutate(state = str_split_fixed(county, " ", 3)[, 2],
+#          county = str_split_fixed(county, " ", 3)[, 3],
+#          county = sub("^[^ ]+ ", "", county),
+#          county = toupper(county),
+#          county = sub(" CO.*| PARISH.*", "", county),
+#          snap_count = as.numeric(gsub(",", "", snap_count))) %>% 
+#   filter(!(state %in% c("AK", "CT", "ID", "MA", "ME", "MO", "MT", "NE", "NH", "NY", "OR", "RI", "UT", "VT", "WA", "WY")))
+#   
+# # Additional check of county names
+#     # Set a threshold for similarity
+#     threshold <- 0.8 
+#     
+#     # Use stringdist to calculate string distances
+#     distances <- stringdist::stringdistmatrix(analysis$county, snap$county, method = "jaccard")
+#     
+#     # Find the closest match for each row in df1
+#     closest_matches <- apply(distances, 1, function(x) ifelse(min(x) < threshold, which.min(x), NA))
+#     
+#     # Create a data frame with the closest matches
+#     matches_df <- data.frame(state_analysis = analysis$state,
+#                              county_analysis = analysis$county,
+#                              state_snap = rep(snap$state, each = nrow(analysis)),
+#                              county_snap = snap$county[closest_matches],
+#                              distance = sapply(1:nrow(analysis), function(i) distances[i, closest_matches[i]])) %>% 
+#       distinct() %>% 
+#       filter(state_analysis == state_snap,
+#              distance != 0)
+# 
+# # Wrangle SNAP county names to match analysis data set as closely as possible
+# snap <- snap %>% 
+#   mutate(county = str_replace(county, "\\bSAINT\\b", "ST"),
+#          county = str_replace(county, "\\bST\\b", "ST."),
+#          county = str_replace(county, "\\sDPW|\\sDSS", ""),
+#          county = ifelse(county == "ETOWQH", "ETOWAH", county),
+#          county = ifelse(county == "CONTRA", "CONTRA COSTA", county),
+#          county = ifelse(county == "SAN BRNDINO", "SAN BERNARDINO", county),
+#          county = ifelse(county == "ARAPAHO", "ARAPAHOE", county),
+#          county = ifelse(county == "D.C. TREASURY", "DISTRICT OF COLUMBIA", county),
+#          county = ifelse(county == "DADE", "MIAMI-DADE", county),
+#          county = ifelse(county == "LA PORTE", "LAPORTE", county),
+#          county = ifelse(county == "WYANDOTTECOUNTY", "WYANDOTTE", county),
+#          county = ifelse(county == "POINTE", "POINTE COUPEE", county),
+#          county = ifelse(state == "LA" & county == "ST. MARYS", "ST. MARY", county),
+#          county = ifelse(county == "PRINCE GEORGES", "PRINCE GEORGE'S", county),
+#          county = ifelse(county == "QUEEN ANNES", "QUEEN ANNE'S", county),
+#          county = ifelse(state == "MD" & county == "ST. MARYS", "ST. MARY'S", county),
+#          county = ifelse(state == "MN" & county == "CHICAGO", "CHISAGO", county),
+#          county = ifelse(county == "LESUEUR", "LE SUEUR", county),
+#          county = ifelse(state == "NV" & county == "CARSON", "CARSON CITY", county),
+#          county = ifelse(county == "DONA ANA", "DOÑA ANA", county),
+#          county = ifelse(county == "CROSS", "ROSS", county),
+#          county = ifelse(county == "DE WITT", "DEWITT", county),
+#          county = ifelse(county == "CCI/ALEXANDRIA", "ALEXANDRIA CITY", county),
+#          county = ifelse(county == "CHARLTSVLE CITY", "CHARLOTTESVILLE CITY", county),
+#          county = ifelse(county == "CITY OF DANVILLE", "DANVILLE CITY", county),
+#          county = ifelse(county == "FREDERICKSBURG", "FREDERICKSBURG CITY", county),
+#          county = ifelse(county == "HARRISONBURG", "HARRISONBURG CITY", county),
+#          county = ifelse(county == "LYNCHBURG", "LYNCHBURG CITY", county),
+#          county = ifelse(county == "NEWPORT NEWS", "NEWPORT NEWS CITY", county),
+#          county = ifelse(county == "PETERSBURG", "PETERSBURG CITY", county),
+#          county = ifelse(county == "ROCKBRIDGE AREA", "ROCKBRIDGE", county),
+#          county = ifelse(county == "STAUNTON-AUGUSTA", "STAUNTON CITY", county),
+#          county = ifelse(county == "SUFFOLK BUR SOC SERV", "SUFFOLK CITY", county),
+#          county = ifelse(county == "VA BEACH DEPT OF SOC S", "VIRGINIA BEACH CITY", county),
+#          county = ifelse(county == "WAYNESBORO", "WAYNESBORO CITY", county),
+#          county = ifelse(county == "WINCHESTER", "WINCHESTER CITY", county),
+#          county = ifelse(county == "GADSEN", "GADSDEN", county),
+#          county = ifelse(county == "HERNNANDO", "HERNANDO", county),
+#          county = ifelse(county == "CHATTOGA", "CHATTOOGA", county),
+#          county = ifelse(state == "GA" & county == "DE KALB", "DEKALB", county),
+#          county = ifelse(county == "WASH", "WASHINGTON", county),
+#          county = ifelse(county == "BENTON SOCIAL SER AGY", "BENTON", county),
+#          county = ifelse(county == "OFFICE WORLD-DELAWARE", "DELAWARE", county),
+#          county = ifelse(county == "BRINKS INC. - RICHLAND", "RICHLAND", county),
+#          county = ifelse(county == "OFFICE WORLD INC-MIAMI", "MIAMI", county),
+#          county = ifelse(county == "OFFICE WORLD-ROSS", "ROSS", county),
+#          county = ifelse(county == "LAWRENCE F STP CSHR", "LAWRENCE", county),
+#          county = ifelse(county == "PENNINGTON FD ST. OFF", "PENNINGTON", county),
+#          county = ifelse(county == "CHESTERFIELD-COL HT", "CHESTERFIELD", county),
+#          county = ifelse(county == "NORFOLK CITY OF", "NORFOLK CITY", county),
+#          county = ifelse(county == "HARRISONBURG/ROCKINGHAM SSD", "ROCKINGHAM", county),
+#          county = ifelse(county == "SCOTT D SS", "SCOTT", county),
+#          county = ifelse(county == "YORK POQUOSON SOC SRVS", "YORK", county),
+#          county = ifelse(county == "OZAUKEE ", "OZAUKEE", county))
+# 
+# # Merge analysis data set and SNAP data to create final analysis data set
+# analysis <- left_join(analysis, snap, by = c("state", "county")) %>% 
+#   filter(!is.na(snap_count)) %>%
+#   mutate(region = case_when(
+#     state %in% c("CT", "ME", "MA", "NH", "RI", "VT", "NJ", "NY", "PA") ~ "Northeast",
+#     state %in% c("IL", "IN", "MI", "OH", "WI", "IA", "KS", "MN", "MO", "NE", "ND", "SD") ~ "Midwest",
+#     state %in% c("DE", "FL", "GA", "MD", "NC", "SC", "VA", "WV", "AL", "KY", "MS", "TN", "AR", "LA", "OK", "TX", "DC") ~ "South",
+#     state %in% c("AK", "CA", "HI", "OR", "WA", "AZ", "CO", "ID", "MT", "NV", "NM", "UT", "WY") ~ "West",
+#     TRUE ~ NA))
+```
+
+```{r, echo=FALSE, eval=TRUE, message=FALSE, warning=FALSE, error=FALSE}
+
+### Step (2) exploratory data analyses
+
+# Load libraries
+library(patchwork)
+
+# Read in longitudinal food insecurity data
+all_insecurity <- read.csv("data/insecurity.csv") %>%
+  rename(state = State,
+         county = `County..State`,
+         year = Year,
+         insecurity_rate = `Overall.Food.Insecurity.Rate`,
+         insecurity_count = `X..of.Food.Insecure.Persons.Overall`) %>% 
+  select(state, county, year, insecurity_rate, insecurity_count) %>%
+  mutate(region = case_when(
+    state %in% c("CT", "ME", "MA", "NH", "RI", "VT", "NJ", "NY", "PA") ~ "Northeast",
+    state %in% c("IL", "IN", "MI", "OH", "WI", "IA", "KS", "MN", "MO", "NE", "ND", "SD") ~ "Midwest",
+    state %in% c("DE", "FL", "GA", "MD", "NC", "SC", "VA", "WV", "AL", "KY", "MS", "TN", "AR", "LA", "OK", "TX", "DC") ~ "South",
+    state %in% c("AK", "CA", "HI", "OR", "WA", "AZ", "CO", "ID", "MT", "NV", "NM", "UT", "WY") ~ "West",
+    TRUE ~ NA)) %>% 
+  mutate(insecurity_rate = as.numeric(sub("%", "", insecurity_rate)),
+         insecurity_count = as.numeric(gsub(",", "", insecurity_count)))
+
+# Visualize food insecurity over time
+p2 <- ggplot(all_insecurity, aes(factor(year), insecurity_rate)) + 
+  geom_boxplot() + 
+  facet_wrap(~region, scales = "free_y") +
+  labs(title = "Figure 2",
+       subtitle = "County-Level Food Insecurity Rates by U.S. Geographic Region, 2019-2021",
+       x = "Year",
+       y = "Food Insecurity Rate") +
+  theme(plot.title = element_text(face = "bold"))
+
+# Clear and expected linear trend for count data
+
+# Visualize food insecurity by COVID-19 cases
+p3 <- ggplot(analysis, aes(cases/10000, insecurity_count/10000)) + 
+  geom_point(aes(color = region)) +
+  labs(title = "Figure 3",
+       subtitle = "County-Level COVID-19 Cases vs. Food Insecurity in the U.S., 2021",
+       y = "Number of Individuals with Food Insecurity/10,000",
+       x = "Number of COVID-19 Cases/10,000",
+       color = "Geographic Region") +
+  theme(plot.title = element_text(face = "bold"))
+
+# Visualize SNAP participation by COVID-19 cases
+p4 <- ggplot(analysis, aes(cases/10000, snap_count/10000)) + 
+  geom_point(aes(color = region)) +
+  labs(title = "Figure 4",
+       subtitle = "County-Level COVID-19 Cases vs. SNAP Participation in the U.S., 2021",
+       y = "Number of Individuals with SNAP/10,000",
+       x = "Number of COVID-19 Cases/10,000",
+       color = "Geographic Region") +
+  theme(plot.title = element_text(face = "bold")) 
+
+# Create scatter plots for rates
+p1 <- ggplot(analysis, aes(case_rate, insecurity_rate)) + 
+  geom_point(aes(color = region)) +
+  geom_smooth(color = "black") +
+  labs(title = "Figure 1",
+       subtitle = "County-Level COVID-19 Case Rate vs. Food Insecurity Rate in the U.S., 2021",
+       y = "Food Insecurity Rate",
+       x = "COVID-19 Case Rate",
+       color = "Geographic Region") +
+  theme(plot.title = element_text(face = "bold"))
+
+p5 <- ggplot(analysis, aes(case_rate, snap_rate)) + 
+  geom_point(aes(color = region)) +
+  geom_smooth(color = "black") +
+  labs(title = "Figure 5",
+       subtitle = "County-Level COVID-19 Cases vs. SNAP Participation in the U.S., 2021",
+       y = "SNAP Participation Rate",
+       x = "COVID-19 Case Rate",
+       color = "Geographic Region") +
+  theme(plot.title = element_text(face = "bold")) 
+
+p1; p2; p3; p4; p5
+```
+
+```{r, echo=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+
+### Step (3) regression analyses
+
+# Load libraries
+library(AER)
+library(pscl)
+
+#--- Run a linear model
+lm <- lm(insecurity_rate ~ case_rate + snap_rate + poverty_rate + median_income, data = analysis)
+
+# Check LINE assumptions
+plot(lm)
+
+# Step-wise selection of covariates
+step(lm, direction = c("both"))
+
+lm.final <- lm(insecurity_rate ~ case_rate + poverty_rate + median_income, data = analysis)
+
+#--- Run a Poisson model
+poisson <- glm(insecurity_count ~ case_rate + snap_rate + poverty_rate + median_income, data=analysis, family=poisson())
+
+# Stepwise selection
+step(poisson, direction = c("both"))
+
+# Assess residuals vs. fitted values
+plot(poisson$fit, abs(rstandard(poisson, type="pearson")),
+     xlab="Fitted Values", ylab="|Standardized Pearson Residuals|")
+
+# Check dispersion
+mean(analysis$insecurity_count)
+var(analysis$insecurity_count)
+dispersiontest(poisson) 
+
+# Negative binomial model to account for overdispersion
+negbin <- MASS::glm.nb(insecurity_count ~ case_rate + snap_rate + poverty_rate + median_income, data=analysis, maxit = 10000)
+
+vif(negbin) # check for collinearity
+
+# Compare models
+lrtest(poisson, negbin)
+AIC(lm.final)
+AIC(negbin)
+```
+
+```{r, echo=FALSE, eval=TRUE, message=FALSE, warning=FALSE, error=FALSE}
+library(knitr)
+
+# Linear model diagnostic plots
+lm <- lm(insecurity_rate ~ case_rate + poverty_rate + median_income, data = analysis)
+par(mfrow = c(2, 2))  # Set up a 2x2 layout for the plots
+plot(lm, which = 1, main = "Figure 6.1")
+plot(lm, which = 2, main = "Figure 6.2")
+plot(lm, which = 3, main = "Figure 6.3")
+plot(lm, which = 5, main = "Figure 6.4")
+
+# Summary of linear model
+lmtable <- as.data.frame(summary(lm)$coefficients)
+kable(lmtable, caption = "Linear Model Summary", format = "markdown", align = "c")
+
+# Summary of neg binomial model
+negbintable <- as.data.frame(summary(MASS::glm.nb(insecurity_count ~ case_rate + snap_rate + poverty_rate + median_income, data=analysis, maxit = 10000))$coefficients)
+kable(negbintable, caption = "Negative Binomial Model Summary", format = "markdown", align = "c")
+```
